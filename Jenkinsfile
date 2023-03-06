@@ -22,7 +22,7 @@ agent any
     /* This builds the actual image; synonymous to
          * docker build on the command line */
       steps{    
-        sh 'echo Build and Tag'
+        app = docker.build("shirlv66/snack:${env.BUILD_ID}")
           }
     }
 
