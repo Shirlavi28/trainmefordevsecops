@@ -25,7 +25,7 @@ agent {
          * docker build on the command line */
       steps{    
         app = docker.build("shirlv66/snack:${env.BUILD_ID}")
-          }
+      }
     }
 
     stage('Post-to-dockerhub') {
