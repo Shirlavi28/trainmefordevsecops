@@ -23,8 +23,10 @@ agent {
     stage('Build-and-Tag') {
     /* This builds the actual image; synonymous to
          * docker build on the command line */
-      steps{    
-        app = docker.build("shirlv66/snack:${env.BUILD_ID}")
+      steps{ 
+        script{
+            app = docker.build("shirlv66/snack:${env.BUILD_ID}")
+        }   
       }
     }
 
