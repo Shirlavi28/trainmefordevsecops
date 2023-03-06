@@ -1,41 +1,53 @@
 pipeline {
-    agent any
+agent any 
 
-    stages {
-        stage('checkout Code') {
-            steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'shir-key', url: 'https://gitlab.com/shirs-group/trainmefordevsecops.git']])
-            }
-        }    
-        stage('SAST') {
-            steps {
-                sh ''  
-            }
-        }
-        stage('build and tag') {
-            steps {
-                sh ''  
-            }
-        }
-        stage('image and vulunerabillity scan') {
-            steps {
-               sh '' 
-            }
-        }
-        stage('post to docker hub') {
-            steps {
-               sh ''   
-            }
-        }
-        stage('pull image server') {
-            steps {
-              sh ''  
-            }
-        } 
-        stage('DAAST') {
-            steps {
-               sh ''   
-            }
+   stages {
+
+    stage('Cloning Git') {
+
+      steps
+        {
+        /* Let's make sure we have the repository cloned to our workspace */
+       checkout scm
+        }  
+    }
+    stage('SAST'){
+      steps{
+        sh 'echo SAST stage'
+       }
+    }
+
+    
+    stage('Build-and-Tag') {
+    /* This builds the actual image; synonymous to
+         * docker build on the command line */
+      steps{    
+        sh 'echo Build and Tag'
+          }
+    }
+
+    stage('Post-to-dockerhub') {
+     steps {
+        sh 'echo post to dockerhub repo'
+     }
+    }
+
+    stage('SECURITY-IMAGE-SCANNER'){
+      steps {
+        sh 'echo scan image for security'
+     }
+    }
+
+    stage('Pull-image-server') {
+      steps {
+         sh 'echo pulling image ...'
+       }
+      }
+    
+    stage('DAST') {
+      steps  {
+         sh 'echo dast scan for security'
         }
     }
+ }
 }
