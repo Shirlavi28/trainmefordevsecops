@@ -1,5 +1,5 @@
 pipeline {
-agent {"shir-build"} 
+agent ["shir-build"] 
 
    stages {
 
