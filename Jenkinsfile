@@ -33,14 +33,14 @@ pipeline {
         stage('Build and Tag') {
             steps {
                 script {
-                    app = docker.build("amitspi/devsecops:${env.BUILD_ID}")
+                    app = docker.build("shirlv66/snake:${env.BUILD_ID}")
                 }
             }
         }
         stage('Image and Vulnerabilty Scan') {
             steps {
                 script {
-                    def imageId = "amitspi/devsecops:${env.BUILD_ID}"
+                    def imageId = "shirlv66/snake:${env.BUILD_ID}"
                     anchoreImageScan(imageId: imageId, failOnPolicy: true, vulnTypeFailThreshold: 10)
                 }
             }
