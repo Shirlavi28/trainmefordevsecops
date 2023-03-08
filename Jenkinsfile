@@ -23,10 +23,10 @@ pipeline {
                 sh 'curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip'
                 sh 'unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/'
                 sh '''sonar-scanner \
-                    -Dsonar.organization=amom-hub \
-                    -Dsonar.projectKey=AmOm-hub_newDevSecOps \
+                    -Dsonar.organization=shirlavi28 \
+                    -Dsonar.projectKey=Shirlavi28_Shir-s-project- \
                     -Dsonar.sources=. \
-                    -Dsonar.host.url=https://sonarcloud.io'''
+                    -Dsonar.host.url=https://sonarcloud.iosonar-scanner \'''
             }
         }
 
