@@ -1,57 +1,76 @@
 pipeline {
-agent {
-    label "shir-build"
-}
-
-   stages {
-
-    stage('Cloning Git') {
-
-      steps
-        {
-        /* Let's make sure we have the repository cloned to our workspace */
-       checkout scm
-        }  
+    agent {
+        label 'docker'
     }
-    stage('SAST'){
-      steps{
-        sh 'echo SAST stage'
-       }
+    tools {
+        maven '3.9.0'
     }
-
-    
-    stage('Build-and-Tag') {
-    /* This builds the actual image; synonymous to
-         * docker build on the command line */
-      steps{ 
-        script{
-            app = docker.build("shirlv66/snack:${env.BUILD_ID}")
-        }   
-      }
+    environment {
+        SONAR_TOKEN = credentials('sonar-token')
     }
+    stages {
+        stage('Git Clone') {
+            steps {
+                // Checkout the code from the repository
+                checkout scm
+            }
+        }
+        stage('SAST') {
+            environment {
+                SONAR_SCANNER_VERSION = '4.7.0.2747'
+                SONAR_SCANNER_HOME = "$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux"
+                PATH = "$SONAR_SCANNER_HOME/bin:$PATH"
+                SONAR_SCANNER_OPTS = '-server'
+            }
+            steps {
+                sh 'curl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip'
+                sh 'unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/'
+                sh '''sonar-scanner \
+                    -Dsonar.organization=amom-hub \
+                    -Dsonar.projectKey=AmOm-hub_newDevSecOps \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=https://sonarcloud.io'''
+            }
+        }
 
-    stage('Post-to-dockerhub') {
-     steps {
-        sh 'echo post to dockerhub repo'
-     }
-    }
-
-    stage('SECURITY-IMAGE-SCANNER'){
-      steps {
-        sh 'echo scan image for security'
-     }
-    }
-
-    stage('Pull-image-server') {
-      steps {
-         sh 'echo pulling image ...'
-       }
-      }
-    
-    stage('DAST') {
-      steps  {
-         sh 'echo dast scan for security'
+        stage('Build and Tag') {
+            steps {
+                script {
+                    app = docker.build("amitspi/devsecops:${env.BUILD_ID}")
+                }
+            }
+        }
+        stage('Image and Vulnerabilty Scan') {
+            steps {
+                script {
+                    def imageId = "amitspi/devsecops:${env.BUILD_ID}"
+                    anchoreImageScan(imageId: imageId, failOnPolicy: true, vulnTypeFailThreshold: 10)
+                }
+            }
+        }
+        stage('Post to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com','username-password-dockerhub') {
+                        app.push("${env.BUILD_ID}")
+                    }
+                }
+            }
+        }
+        stage('Pull image Server') {
+            steps {
+                sh 'docker-compose down'
+                sh 'docker-compose up -d'
+            }
+        }
+        stage('DAAST') {
+            steps {
+                arachniScanner(
+                    url: 'http://63.34.64.229:8080',
+                    checks: 'xss, sql_injection',
+                    reportFilename: 'arachni_report.html'
+                )
+            }
         }
     }
- }
 }
