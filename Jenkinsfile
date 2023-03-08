@@ -2,9 +2,6 @@ pipeline {
     agent {
         label 'docker'
     }
-    tools {
-        maven '3.9.0'
-    }
     environment {
         SONAR_TOKEN = credentials('sonar-token')
     }
