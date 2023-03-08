@@ -3,7 +3,7 @@ pipeline {
         label 'shir-build'
     }
     environment {
-        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_TOKEN = credentials('shir-git-hub')
     }
     stages {
         stage('Git Clone') {
