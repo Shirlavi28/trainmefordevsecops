@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'docker'
+        label 'shir-build'
     }
     environment {
         SONAR_TOKEN = credentials('sonar-token')
